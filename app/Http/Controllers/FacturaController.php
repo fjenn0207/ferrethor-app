@@ -11,6 +11,15 @@ class FacturaController extends Controller
 {
     public function index(Request $request)
     {
+        // BLOQUE DE DIAGNÓSTICO TEMPORAL
+        dd([
+            'host' => env('DB_HOST'),
+            'port' => env('DB_PORT'),
+            'database' => env('DB_DATABASE'),
+            'user' => env('DB_USERNAME'),
+            'url' => env('DATABASE_URL')
+        ]);
+
         $search = $request->input('search');
         $hoy = \Carbon\Carbon::now();
 
@@ -167,6 +176,7 @@ class FacturaController extends Controller
 
         return redirect()->route('facturas.historial')->with('success', 'Factura eliminada permanentemente.');
     }
+
     public function guardarComplemento(Request $request, $id)
     {
         $factura = Factura::findOrFail($id);
