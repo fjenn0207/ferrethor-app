@@ -1,0 +1,31 @@
+:root {
+    --side-bg: #1a1c24;
+    --main-bg: #f4f7f6;
+    --accent: #f26522; /* El naranja industrial */
+    --text-dark: #2d3436;
+}
+
+body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
+
+/* Barra lateral innovadora */
+.sidebar {
+    width: 250px; height: 100vh; background: var(--side-bg);
+    position: fixed; left: 0; top: 0; padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.logo-area { text-align: center; margin-bottom: 40px; padding: 10px; }
+.logo-area img { width: 180px; height: auto; }
+
+.nav-item {
+    padding: 15px; color: #a4b0be; text-decoration: none;
+    display: block; border-radius: 8px; transition: 0.3s;
+}
+.nav-item:hover, .nav-item.active { background: var(--accent); color: white; }
+
+/* Contenido Principal */
+.content { margin-left: 250px; padding: 30px; }
+.card-modern {
+    background: white; border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05); padding: 25px;
+}
