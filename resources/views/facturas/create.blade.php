@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Nueva Factura - FERRETHOR</title>
+    <title>Nuevo Registro - FERRETHOR</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -61,7 +61,9 @@
             <div class="col-md-8">
                 <div class="card shadow border-0 rounded-3">
                     <div class="card-header card-header-ferre py-3">
-                        <h5 class="mb-0"><i class="fa-solid fa-file-circle-plus me-2"></i> Registrar Nueva Factura</h5>
+                        <h5 class="mb-0" id="titulo-card">
+                            <i class="fa-solid fa-file-circle-plus me-2"></i> Registrar Nuevo Documento
+                        </h5>
                     </div>
                     <div class="card-body p-4">
                         
@@ -79,19 +81,29 @@
                         <form action="{{ route('facturas.store') }}" method="POST">
                             @csrf
 
+                            <!-- Selector de Tipo de Documento -->
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Folio de la Factura</label>
-                                <input type="text" name="folio_factura" class="form-control" required placeholder="Ej. F-98765" value="{{ old('folio_factura') }}">
+                                <label class="form-label fw-bold">Tipo de Documento</label>
+                                <select name="tipo" id="tipo_documento" class="form-select border-warning" required onchange="cambiarTitulo()">
+                                    <option value="factura" {{ old('tipo') == 'factura' ? 'selected' : '' }}>Factura Oficial</option>
+                                    <option value="remision" {{ old('tipo') == 'remision' ? 'selected' : '' }}>Remisión / Nota Previa</option>
+                                    <option value="nota_credito" {{ old('tipo') == 'nota_credito' ? 'selected' : '' }}>Nota de Crédito</option>
+                                </select>
+                                <div class="form-text">Selecciona si vas a registrar una factura definitiva, una remisión previa o una nota de crédito.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" id="label-folio">Folio del Documento</label>
+                                <input type="text" name="folio_factura" class="form-control" required placeholder="Ej. F-98765 / REM-123" value="{{ old('folio_factura') }}">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Proveedor</label>
                                 <div class="input-group">
-                                    <!-- Selector único de proveedores para evitar duplicados -->
                                     <select name="proveedor_id" class="form-select" required>
                                         <option value="" selected disabled>-- Selecciona un proveedor registrado --</option>
                                         @foreach($proveedores as $proveedor)
-                                            <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
+                                            <option value="{{ $proveedor->id }}" {{ old('proveedor_id') == $proveedor->id ? 'selected' : '' }}>{{ $proveedor->nombre }}</option>
                                         @endforeach
                                     </select>
                                     <a href="{{ route('proveedores.create') }}" class="btn btn-outline-secondary" title="Dar de alta nuevo proveedor">
@@ -104,11 +116,11 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Fecha de Expedición</label>
-                                    <input type="date" name="fecha_expedicion" class="form-control" required value="{{ date('Y-m-d') }}">
+                                    <input type="date" name="fecha_expedicion" class="form-control" required value="{{ old('fecha_expedicion', date('Y-m-d')) }}">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Fecha de Vencimiento</label>
-                                    <input type="date" name="fecha_vencimiento" class="form-control" required>
+                                    <input type="date" name="fecha_vencimiento" class="form-control" required value="{{ old('fecha_vencimiento') }}">
                                 </div>
                             </div>
 
@@ -119,7 +131,7 @@
 
                             <div class="d-flex justify-content-end">
                                 <a href="{{ route('facturas.index') }}" class="btn btn-secondary me-2">Cancelar</a>
-                                <button type="submit" class="btn btn-ferre-primary">Guardar Factura</button>
+                                <button type="submit" class="btn btn-ferre-primary" id="btn-guardar">Guardar Documento</button>
                             </div>
                         </form>
                     </div>
@@ -129,5 +141,30 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function cambiarTitulo() {
+            const select = document.getElementById('tipo_documento');
+            const tituloCard = document.getElementById('titulo-card');
+            const labelFolio = document.getElementById('label-folio');
+            const btnGuardar = document.getElementById('btn-guardar');
+
+            if (select.value === 'remision') {
+                tituloCard.innerHTML = '<i class="fa-solid fa-file-lines me-2"></i> Registrar Nueva Remisión (Previa)';
+                labelFolio.innerText = 'Folio de la Remisión';
+                btnGuardar.innerText = 'Guardar Remisión';
+            } else if (select.value === 'nota_credito') {
+                tituloCard.innerHTML = '<i class="fa-solid fa-file-invoice-dollar me-2"></i> Registrar Nueva Nota de Crédito';
+                labelFolio.innerText = 'Folio de la Nota de Crédito';
+                btnGuardar.innerText = 'Guardar Nota de Crédito';
+            } else {
+                tituloCard.innerHTML = '<i class="fa-solid fa-file-circle-plus me-2"></i> Registrar Nueva Factura';
+                labelFolio.innerText = 'Folio de la Factura';
+                btnGuardar.innerText = 'Guardar Factura';
+            }
+        }
+
+        // Ejecutar al cargar por si recarga la página con errores de validación
+        document.addEventListener("DOMContentLoaded", cambiarTitulo);
+    </script>
 </body>
 </html>

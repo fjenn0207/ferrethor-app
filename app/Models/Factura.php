@@ -23,6 +23,8 @@ class Factura extends Model
         'complemento_fecha',
         'complemento_monto',
         'comprobante_complemento',
+        'tipo',     // <--- Nuevo
+        'estatus',  // <--- Nuevo
     ];
 
     public function proveedor()

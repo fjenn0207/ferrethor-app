@@ -44,10 +44,11 @@ class FacturaController extends Controller
             'folio_factura' => 'required|string|unique:facturas,folio_factura',
             'fecha_expedicion' => 'required|date',
             'monto' => 'required|numeric|min:0',
+            'tipo' => 'nullable|string|in:factura,remision,nota_credito', // Validamos el tipo
         ]);
 
         $proveedor = Proveedor::findOrFail($request->proveedor_id);
-        $diasCredito = $request->input('dias_credito', $proveedor->dias_credito);
+        $diasCredito = $request->input('dias_credito', $proveedor->dias_credito ?? 0);
         $fechaVencimiento = Carbon::parse($request->fecha_expedicion)->addDays($diasCredito);
 
         Factura::create([
@@ -58,9 +59,11 @@ class FacturaController extends Controller
             'monto' => $request->monto,
             'pagado' => false,
             'complemento_recibido' => false,
+            'tipo' => $request->input('tipo', 'factura'), // Si no se manda nada, se guarda como factura normal
+            'estatus' => 'activo',
         ]);
 
-        return redirect()->route('facturas.index')->with('success', 'Factura registrada con éxito.');
+        return redirect()->route('facturas.index')->with('success', 'Registro guardado con éxito.');
     }
 
     public function destroy($id)
@@ -202,5 +205,17 @@ class FacturaController extends Controller
         $factura->save();
 
         return redirect()->route('facturas.index')->with('success', 'Registro guardado correctamente.');
+    }
+    public function convertirAFactura($id)
+    {
+        $factura = Factura::findOrFail($id);
+
+        // Cambiamos el tipo a factura oficial y el estatus a convertida
+        $factura->update([
+            'tipo' => 'factura',
+            'estatus' => 'convertida'
+        ]);
+
+        return redirect()->route('facturas.index')->with('success', '¡Remisión convertida a factura oficial con éxito!');
     }
 }
